@@ -1,9 +1,23 @@
 function compute_rook_moves(board_state, cpos){
     let opos = []
-    for (let i = cpos[0]+1; i < board_state.length; i++){
-            opos.push([cpos[0], i])
-            if (board_state[cpos[0]][i] != '.'){
-                break
+    let term = 0
+    for (let i = 0; i < board_state.length; i++){
+            if (i < cpos[0]) {
+                if (board_state[cpos[0]][i] != '.'){
+                    if (term == 0){
+                        term += 1;
+                    }
+                } else {
+                    opos.push([cpos[0], i])
+                }
+            } else {
+                opos.push([cpos[0], i])
+                if (board_state[cpos[0]][i] != '.'){
+                    if (term == 1){ 
+                        term += 1;
+                        break;
+                    }
+                }
             }
 
     }
@@ -45,7 +59,7 @@ function compute_bishop_moves(board_state, cpos){
 }
 
 
-function compute_available_moves(board_state, cpos) {
+function compute_available_moves(board_state, cpos, piece_color) {
     let value = board_state[cpos[0]][cpos[1]]
     let opos = []
 
@@ -84,13 +98,30 @@ function compute_available_moves(board_state, cpos) {
             break
         case 'p':
             console.log("pawn")
-            if (cpos[0] + 1 < board_state.length){
-                if (cpos[1] - 1 >= 0 && cpos[1] - 1 < board_state.length){
+            if (piece_color == 'b') {
+                if (cpos[1] - 1 >= 0 && cpos[1] - 1 >= 0 && board_state[cpos[0]-1][cpos[1]-1] == '.'){
                     opos.push([cpos[0] - 1, cpos[1] - 1])
                 }
-                opos.push([cpos[0] -1 , cpos[1]])
-                if (cpos[1] - 1 < board_state.length){
+                if ( cpos[0]-1 >= 0 && board_state[cpos[0]-1][cpos[1]] == '.'){
+                    opos.push([cpos[0] -1 , cpos[1]])
+                }
+                if (cpos[0]-1 >= 0 && cpos[1] + 1 < board_state.length && board_state[cpos[0]-1][cpos[1]+1] == '.'){
                     opos.push([cpos[0] - 1, cpos[1]+1])
+                }
+            } else {
+                if (cpos[0] + 1 < board_state.length){
+                    if (cpos[1] - 1 >= 0 && cpos[1] - 1 < board_state.length && board_state[cpos[0]+1][cpos[1]-1] == '.'){
+                        opos.push([cpos[0] + 1, cpos[1] - 1])
+                    }
+
+                    if (board_state[cpos[0]+1][cpos[1]] == '.'){
+                        opos.push([cpos[0] + 1 , cpos[1]])
+                    }
+                    if (cpos[1] - 1 < board_state.length){
+                        if (board_state[cpos[0]+1][cpos[1]+1]=='.'){
+                            opos.push([cpos[0] + 1, cpos[1]+1])
+                        }
+                    }
                 }
             }
             break
@@ -101,6 +132,10 @@ function compute_available_moves(board_state, cpos) {
 
     return opos
 }
+
+
+
+
 
 module.exports = {
     "compute_available_moves" : compute_available_moves

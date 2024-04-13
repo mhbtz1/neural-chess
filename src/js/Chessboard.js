@@ -1,10 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react'
 import { compute_available_moves } from './ChessUtilityFunctions'
 
-export const LOWER_X = 645
-export const LOWER_Y = 0
-export const UPPER_X = 1276
-export const UPPER_Y = 635
 export const GRID_SIZE = 80
 
 
@@ -28,7 +24,6 @@ function Board() {
                           "bbbbbbbb"]
     let defaultCellColors = []
 
-    let piece_colors = ["blk", "wt"]
 
     let whiteBoardState = new Map()
     let blackBoardState = new Map()
@@ -59,23 +54,62 @@ function Board() {
     const [cellBackgroundColors, setCellBackgroundColors] = useState(defaultCellColors)
     const [selected, setSelected] = useState([])
     const [pieceOrdering, setPieceOrdering] = useState(piece_ordering)
+    const [pieceColoring, setPieceColoring] = useState(piece_coloring)
+
+    const moveComponent = (state, coord, flag) => {
+        let curString = [...state[coord[0]]]
+        curString[coord[1]] = state[selected[0]][selected[1]]
+        state[coord[0]] = curString
+        let nxtString = [...state[selected[0]]]
+        nxtString[selected[1]] = '.'
+        state[selected[0]] = nxtString
+        if (flag == 0){
+            setPieceOrdering(state)
+            for (let i = 0; i < piece_ordering.length; i += 1){
+                for (let j = 0; j < piece_ordering[0].length; j += 1){
+                    console.log(`${i}, ${j} : ${piece_ordering[i][j]}`)
+                }
+                console.log('\n')
+            }
+        } else {
+            setPieceColoring(state)
+        }
+    }
+    
+    const movePiece = (coord) => {
+        moveComponent(pieceOrdering, coord, 0)
+        moveComponent(pieceColoring, coord, 1)
+    }
 
     const clickEvent = (event) => {
+        
+        const LOWER_X = 645
+        const LOWER_Y = 0
+        
         console.log("RUN!")
         let pos = [event.clientX, event.clientY]
         console.log(`pos; ${pos}`)
         let coord = [ Math.floor((pos[1] - LOWER_Y) / (GRID_SIZE)), Math.floor((pos[0] - LOWER_X)/(GRID_SIZE)) ]
-
+        let piece_ordering = [...pieceOrdering]
+        let piece_coloring = [...pieceColoring]
+        let cell_background = [...defaultCellColors]
+        
         if (piece_ordering[coord[0]][coord[1]] != '.'){
-            let availCells = compute_available_moves(piece_ordering, coord)
+            for (let i = 0; i < piece_coloring.length; i += 1){
+                for (let j = 0; j < piece_coloring[0].length; j += 1){
+                    console.log(`${i}, ${j} : ${piece_coloring[i][j]}`)
+                }
+                console.log('\n')
+            }
+            console.log(`Current selected piece's color: ${piece_coloring[coord[0]][coord[1]]}`)
+            let availCells = compute_available_moves(piece_ordering, coord, piece_coloring[coord[0]][coord[1]])
             setCellBackgroundColors(defaultCellColors)
 
-            let cp = Array.from(defaultCellColors)
             for (const cell of availCells) {
                 let [x, y] = cell
-                cp[x][y] = "red"
+                cell_background[x][y] = "red"
             }
-            setCellBackgroundColors(cp)
+            setCellBackgroundColors(cell_background)
         }
 
         if (selected.length == 0 && piece_ordering[coord[0]][coord[1]] != '.'){
@@ -83,11 +117,19 @@ function Board() {
             setSelected(coord)
         } else if (selected.length > 0){
             console.log("MOVED!")
-            let piece_ordering = Array.from(pieceOrdering)
-            piece_ordering[selected[0]][selected[1]] = piece_ordering[coord[0]][coord[1]]
-            piece_ordering[coord[0]][coord[1]] = '.'
-            setPieceOrdering(piece_ordering)
+            console.log(`Final position: ${coord[0]}, ${coord[1]}`)
+
+            movePiece(coord)
+            setSelected([])
+            for (let i = 0; i < defaultCellColors.length; i++) {
+                for (let j = 0; j < defaultCellColors[i].length; j++){
+                    cell_background[i][j] = defaultCellColors[i][j]
+                }
+            }
+            setCellBackgroundColors(cell_background)
+            
         }
+            
     }
 
 
@@ -96,7 +138,7 @@ function Board() {
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             let s = `w-20 h-20 bg-${cellBackgroundColors[i][j]}-600 border border-black flex justify-center items-center`
-            boardCode.push(<PieceRender pieceColor={piece_coloring[i][j]} className={s} pieceName={piece_ordering[i][j]} 
+            boardCode.push(<PieceRender pieceColor={pieceColoring[i][j]} className={s} pieceName={pieceOrdering[i][j]} 
                     onClick={clickEvent}> </PieceRender>)   
             pos[1] += 1
         }
@@ -107,13 +149,21 @@ function Board() {
 
     let properRows = []
     for (let i = 0; i < 8; i ++) {
-        properRows.push(<div className = "flex flex-row justify-center items-center">
+        let wstr = `row-${i}`
+        properRows.push(<div className = "flex flex-row justify-center items-center" id={wstr} >
                                 {boardCode.slice(8*i, 8*(i+1))} 
                         </div>)
     }
 
     return (
             <div>
+            <nav class="crumbs">
+                <ul>
+                    <li class="crumb"><a href="#">Bikes</a></li>
+                    <li class="crumb"><a href="#">BMX</a></li>
+                    <li class="crumb">Jump Bike 3000</li>
+                </ul>
+            </nav>
             <header className="flex justify-center"> <h1> Neural Chess Engine </h1></header>
             <div className="chessboard">
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></link>
