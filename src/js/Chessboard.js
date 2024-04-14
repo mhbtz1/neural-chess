@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react'
-import { compute_available_moves } from './ChessUtilityFunctions'
+import { compute_available_moves } from '../logic/ChessUtilityFunctions.js'
+import "../logic/move_validator.js"
 
 export const GRID_SIZE = 80
 
@@ -156,20 +157,13 @@ function Board() {
     }
 
     return (
-            <div>
-            <nav class="crumbs">
-                <ul>
-                    <li class="crumb"><a href="#">Bikes</a></li>
-                    <li class="crumb"><a href="#">BMX</a></li>
-                    <li class="crumb">Jump Bike 3000</li>
-                </ul>
-            </nav>
+            <section>
             <header className="flex justify-center"> <h1> Neural Chess Engine </h1></header>
             <div className="chessboard">
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></link>
                 {properRows}
             </div>
-            </div>);
+            </section>);
 
 }
 

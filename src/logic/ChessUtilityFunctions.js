@@ -19,8 +19,29 @@ function compute_rook_moves(board_state, cpos){
                     }
                 }
             }
-
+ 
     }
+    term = 0;
+    for (let i = 0; i < board_state[0].length; i += 1){
+        if (i < cpos[1]){       
+             if (board_state[i][cpos[1]] != '.'){
+                if (term == 0){
+                    term += 1
+                }
+            } else {
+                opos.push([i, cpos[1]])
+            }
+        } else {
+            opos.push([i, cpos[1]])
+            if (board_state[i][cpos[1]] != '.'){
+                if (term == 1){
+                    term += 1;
+                    break;
+                }
+            }
+        }
+    }
+
     return opos
 }
 
@@ -28,6 +49,9 @@ function compute_knight_moves(board_state, cpos) {
     let opos = []
      let nxt_pos = [ [1, 2], [-1, 2], [-1, -2], [1, -2], [2, 1], [2, -1], [-2, -1], [-2, 1] ]
             for (const pos of nxt_pos) {
+                if (board_state[pos[0]][pos[1]] != '.'){
+                    continue
+                }
                 if (pos[0] + cpos[0] < 0 || pos[0] + cpos[0] >= board_state[0].length) {
                     continue
                 }
@@ -43,16 +67,21 @@ function compute_bishop_moves(board_state, cpos){
     let opos = []
     let nxt_pos = [ [1, 1], [1, -1], [-1, 1], [-1, -1] ]
     for (let pos of nxt_pos) {
-        console.log(pos)
-        if (pos[0] + cpos[0] < 0 || pos[0] + cpos[0] >= board_state[0].length) {
-            continue
-        }
-        if (pos[1] + cpos[1] < 0 || pos[1] + cpos[1] >= board_state[1].length){
-            continue
-        }
-        opos.push([pos[0] + cpos[0], pos[1] + cpos[1]])
-        if (board_state[pos[0] + cpos[0]][pos[1] + cpos[1]] != '.'){
-            break
+        let ncpos = [...cpos]
+        while (ncpos[0] < board_state.length && ncpos[1] < board_state[0].length) {
+            console.log(ncpos)
+            if (pos[0] + ncpos[0] < 0 || pos[0] + ncpos[0] >= board_state[0].length) {
+                continue
+            }
+            if (pos[1] + ncpos[1] < 0 || pos[1] + ncpos[1] >= board_state[1].length){
+                continue
+            }
+            opos.push([pos[0] + ncpos[0], pos[1] + ncpos[1]])
+            if (board_state[pos[0] + ncpos[0]][pos[1] + ncpos[1]] != '.'){
+                break
+            }
+            ncpos[0] += pos[0]
+            ncpos[1] += pos[1]
         }
     }
     return opos
@@ -132,9 +161,6 @@ function compute_available_moves(board_state, cpos, piece_color) {
 
     return opos
 }
-
-
-
 
 
 module.exports = {
