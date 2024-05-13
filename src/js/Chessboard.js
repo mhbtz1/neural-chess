@@ -1,6 +1,7 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useState} from 'react'
 import { compute_available_moves } from '../logic/ChessUtilityFunctions.js'
 import "../logic/move_validator.js"
+import "../css/button.css"
 
 export const GRID_SIZE = 80
 
@@ -41,7 +42,7 @@ function Board() {
     for (let i = 0; i < 8; i++) {
         let boardRow = []
         for (let j = 0; j < 8; j++){
-            if ( (i + j) % 2 == 0){
+            if ( (i + j) % 2 === 0){
                 boardRow.push("white")
             } else {
                 boardRow.push("gray")
@@ -50,8 +51,6 @@ function Board() {
         defaultCellColors.push(boardRow)
     }
 
-    const [whitePiecePositions, setWhitePiecePositions] = useState(whiteBoardState)
-    const [blackPiecePositions, setBlackPiecePositions] = useState(blackBoardState)
     const [cellBackgroundColors, setCellBackgroundColors] = useState(defaultCellColors)
     const [selected, setSelected] = useState([])
     const [pieceOrdering, setPieceOrdering] = useState(piece_ordering)
@@ -62,9 +61,10 @@ function Board() {
         curString[coord[1]] = state[selected[0]][selected[1]]
         state[coord[0]] = curString
         let nxtString = [...state[selected[0]]]
+
         nxtString[selected[1]] = '.'
         state[selected[0]] = nxtString
-        if (flag == 0){
+        if (flag === 0){
             setPieceOrdering(state)
             for (let i = 0; i < piece_ordering.length; i += 1){
                 for (let j = 0; j < piece_ordering[0].length; j += 1){
@@ -86,8 +86,8 @@ function Board() {
         
         const LOWER_X = 645
         const LOWER_Y = 0
-        
         console.log("RUN!")
+
         let pos = [event.clientX, event.clientY]
         console.log(`pos; ${pos}`)
         let coord = [ Math.floor((pos[1] - LOWER_Y) / (GRID_SIZE)), Math.floor((pos[0] - LOWER_X)/(GRID_SIZE)) ]
@@ -95,7 +95,7 @@ function Board() {
         let piece_coloring = [...pieceColoring]
         let cell_background = [...defaultCellColors]
         
-        if (piece_ordering[coord[0]][coord[1]] != '.'){
+        if (selected.toString() === [].toString() && piece_ordering[coord[0]][coord[1]] != '.'){
             for (let i = 0; i < piece_coloring.length; i += 1){
                 for (let j = 0; j < piece_coloring[0].length; j += 1){
                     console.log(`${i}, ${j} : ${piece_coloring[i][j]}`)
@@ -113,10 +113,20 @@ function Board() {
             setCellBackgroundColors(cell_background)
         }
 
-        if (selected.length == 0 && piece_ordering[coord[0]][coord[1]] != '.'){
+        if (selected.length === 0 && piece_ordering[coord[0]][coord[1]] !== '.'){
             console.log("SELECTED!")
             setSelected(coord)
+        } else if (selected.toString() === coord.toString() ) {
+            console.log("Same piece selected. resetting...")
+            setSelected([])
+            for (let i = 0; i < defaultCellColors.length; i++) {
+                for (let j = 0; j < defaultCellColors[i].length; j++){
+                    cell_background[i][j] = defaultCellColors[i][j]
+                }
+            }
+            setCellBackgroundColors(cell_background)
         } else if (selected.length > 0){
+            console.log(`Previously selected coord: ${coord[0]}, ${coord[1]}`)
             console.log("MOVED!")
             console.log(`Final position: ${coord[0]}, ${coord[1]}`)
 
@@ -156,12 +166,35 @@ function Board() {
                         </div>)
     }
 
+    const backendCall = async (event) => { 
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Make a POST request to the backend endpoint
+        const response = await fetch("/submit_form", {
+            method: "POST",
+            body: formData
+        })
+        
+        if (!response.ok) {
+                throw new Error("Network response was not ok");
+        } else {
+            return response.text(); // Parse response as text
+        }
+
+    }
     return (
             <section>
             <header className="flex justify-center"> <h1> Neural Chess Engine </h1></header>
             <div className="chessboard">
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></link>
                 {properRows}
+            </div>
+            <div class="relative bg-black justify-center w-48 h-32">
+                <form onSubmit={backendCall} id="testform"> 
+                    <button type="submit" className="form_button"> Submit to backend</button>
+                </form>
             </div>
             </section>);
 
@@ -171,20 +204,19 @@ function PieceRender({pieceColor, className, pieceName, onClick}) {
 
     let mp = {"k" : "knight", "r" : "rook", "p" : "pawn", "b" : "bishop", "q" : "queen", "K": "king"}
     let mp2 = {"w": "white", "b": "black"}
-    let fp = `./chess-assets/${mp2[pieceColor]}_${mp[pieceName]}.png`
+    let fp = `/images/${mp2[pieceColor]}_${mp[pieceName]}.png`
     
-
-    if (pieceName != '.' && pieceColor != '.') {
+    if (pieceName !== '.' && pieceColor !== '.') {
         const id = pieceColor + '_' + pieceName
         return (
                 <div id={id} className={className} onClick={onClick}>
-                    <img className="w-20 h-20 custom-opacity flex justify-center items-center" src={fp}  />
+                    <img className="w-20 h-20 custom-opacity flex justify-center items-center" src={fp} 
+                    alt={`${mp2[pieceColor]} ${mp[pieceName]}`}/>
                 </div>
             )
     }
 
-    return <div className={className} onClick={onClick}>
-           </div>
+    return <div className={className} onClick={onClick}> </div>
 }
 
 
