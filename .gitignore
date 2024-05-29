@@ -18,6 +18,9 @@ dist
 .env.test.local
 .env.production.local
 
+#rust api
+/robot/target
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
