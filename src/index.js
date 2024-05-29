@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './css/index.css';
 import App from './ts/App';
 import reportWebVitals from './reportWebVitals';
+import '../public/favicon.ico'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

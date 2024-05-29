@@ -10,7 +10,6 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.jsx', '.tsx']
@@ -18,12 +17,12 @@ module.exports = {
   
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'public/index.html'),
+      template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html'
     }),
     new CopyPlugin({
       patterns: [
-        { from: 'public/chess-assets', to:  'images' }
+        { from: 'public/chess-assets', to:  'images' },
       ]
     })
   ],
@@ -69,6 +68,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.ico$/,
+        use: ['file-loader']
       }
     ]
   },

@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import compute_available_moves from '../logic/ChessUtilityFunctions'
 import "../css/button.css"
+import { Button } from '@mui/material';
 
 export const GRID_SIZE = 80
 
@@ -191,12 +192,18 @@ function Board() {
         }
 
     }
+
+
+    const color = colorMove === 'w' ? 'white' : 'black'
     return (
         <>
             <section>
             <div className="chessboard">
                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></link>
                 {properRows}
+            </div>
+            <div className= 'w-50 h-20' style={{'position' : 'relative', 'left' : '460pt', 'margin-top': '50pt'}}>
+                <Button variant="outlined"> {color} </Button>
             </div>
             </section>
         </>);
