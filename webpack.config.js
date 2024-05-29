@@ -13,7 +13,7 @@ module.exports = {
     publicPath: '/'
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.tsx']
   },
   
   plugins: [
@@ -30,6 +30,19 @@ module.exports = {
 
   module: {
     rules: [
+      {
+        test: /\.tsx$/,
+        exclude: [
+            path.resolve(__dirname, 'node_modules'),
+            path.resolve(__dirname, 'src/server/') 
+        ],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react']
+          }
+        }
+      },
       {
         test: /\.js$/,
         exclude: [
